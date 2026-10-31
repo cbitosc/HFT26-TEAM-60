@@ -1,0 +1,169 @@
+.page {
+  --landing-scroll: 0;
+  position: relative;
+}
+
+/* The scene stays behind the whole page, so glass panels have a sky to blur. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--black);
+}
+
+.still {
+  object-fit: cover;
+}
+
+/* The scene fades up only once it can draw, so its load is never seen. */
+.scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.page[data-ready="true"] .scene {
+  opacity: 1;
+}
+
+/* Readability only: darkens the copy's side, then the sky as the page scrolls. */
+.veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.28) 38%,
+      transparent 60%
+    ),
+    rgba(0, 0, 0, calc(var(--landing-scroll) * 0.8));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.4s var(--ease-cinematic);
+}
+
+.page:not([data-phase="intro"]) .veil {
+  opacity: 1;
+}
+
+.stage {
+  position: relative;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+}
+
+/* The opening title. It yields to the hero's own wordmark. */
+.title {
+  position: absolute;
+  top: 17%;
+  right: 0;
+  left: 0;
+  color: var(--white);
+  font-family: var(--type-display);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  font-size: clamp(3rem, 2rem + 4vw, 6rem);
+  line-height: 1;
+  text-align: center;
+  opacity: 0;
+  transform: scale(1.06);
+  /* Opacity and transform only, which stay smooth while the scene is busy. */
+  transition:
+    opacity 0.8s ease,
+    transform 1.6s var(--ease-cinematic);
+  pointer-events: none;
+}
+
+.page[data-phase="intro"][data-ready="true"] .title {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1.4s ease 0.4s,
+    transform 1.8s var(--ease-cinematic) 0.4s;
+}
+
+/* Appears only while the scene is genuinely still loading. */
+.progress {
+  position: absolute;
+  bottom: 4.5rem;
+  left: 50%;
+  width: 7rem;
+  height: 1px;
+  overflow: hidden;
+  background: var(--line);
+  transform: translateX(-50%);
+}
+
+.progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--silver);
+  animation: progress 1.3s ease-in-out infinite alternate;
+}
+
+@keyframes progress {
+  to {
+    transform: translateX(150%);
+  }
+}
+
+.skip {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 1.5rem;
+  z-index: 4;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: rgba(16, 16, 16, 0.45);
+  color: var(--soft);
+  font-size: var(--text-small);
+  cursor: pointer;
+  opacity: 0;
+  backdrop-filter: blur(14px);
+  animation: skip-in 0.5s ease 0.4s forwards;
+  transition: color var(--dur-1) var(--ease-cinematic), border-color var(--dur-1) var(--ease-cinematic);
+}
+
+.skip:hover {
+  border-color: var(--line-strong);
+  color: var(--white);
+}
+
+.skip:focus-visible {
+  opacity: 1;
+}
+
+@keyframes skip-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.after {
+  position: relative;
+}
+
+@media (max-width: 760px) {
+  .veil {
+    background:
+      linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%),
+      rgba(0, 0, 0, calc(var(--landing-scroll) * 0.68));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title {
+    display: none;
+  }
+}
